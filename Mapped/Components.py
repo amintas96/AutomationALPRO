@@ -1,0 +1,13 @@
+
+SITE = 'https://alocpro.mirante.net.br/alocpro/login.jsp'
+SITE_DATA = 'https://alocpro.mirante.net.br/alocpro/wicket/atv/registro/registroAtividades?dt='
+xpath_user = '/html/body/div[1]/div[1]/form/div/div/div[2]/input'
+xpath_password = '/html/body/div[1]/div[1]/form/div/div/div[3]/input'
+xpath_enter_inicial = '/html/body/div[1]/div[1]/form/div/div/div[5]/input'
+xpath_registrar = '/html/body/div[1]/div[2]/div[3]/ul/li[1]/a/span'
+xpath_atividade_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[2]/input[2]'
+xpath_horario_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[5]/input'
+xpath_fimHora_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[6]/input'
+xpath_registra_atividade = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tfoot/tr[2]/td/button'
+INTERVAL = 'Intervalo (Não Contabilizado)'
+
