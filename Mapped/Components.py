@@ -11,3 +11,5 @@ xpath_fimHora_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbo
 xpath_registra_atividade = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tfoot/tr[2]/td/button'
 INTERVAL = 'Intervalo (Não Contabilizado)'
 
+USUARIO_AUTH = 'amintas'
+PASSWORD_AUTH = 'Miojo@1996'

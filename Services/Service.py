@@ -1,9 +1,8 @@
+from click.parser import Option
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from Mapped import Components as Cp
 from datetime import datetime
-
-
 
 
 def do_login(dv, username, password):
@@ -18,8 +17,7 @@ def do_login(dv, username, password):
         return False
 
 
-
-def limpa_campos(dv):
+def clear_fields(dv):
     try:
         dv.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[4]/td[5]/input').clear()
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial).clear()
@@ -31,10 +29,11 @@ def limpa_campos(dv):
     except Exception as e:
         raise Exception(f"falha durante a limpeza dos campos:  {e}!")
 
+
 def do_registration(json):
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")
-    dv = webdriver.Chrome()
+    options.add_argument("--headless")
+    dv = webdriver.Chrome(options=options)
     try:
 
         username = json['username']
@@ -59,10 +58,8 @@ def do_registration(json):
             data_formatada = data_hoje.strftime("%Y-%m-%d")
             dv.get(Cp.SITE_DATA + data_formatada)
 
-
         if dv.find_element(By.XPATH, Cp.xpath_horario_inicial).get_attribute('value'):
-            limpa_campos(dv)
-
+            clear_fields(dv)
 
         #Parte inicial do registro do ponto
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial).send_keys(activity)
@@ -79,6 +76,6 @@ def do_registration(json):
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[3]")).send_keys("4:00")
 
         dv.find_element(By.XPATH, Cp.xpath_registra_atividade).click()
-        return {'Sucesso': True, 'Mensagem':"Registro realizado com sucesso"}
+        return {'Sucesso': True, 'Mensagem': "Registro realizado com sucesso"}
     except Exception as e:
         return {'Sucesso': False, 'Mensagem': f" Falha no registro: {e}"}
