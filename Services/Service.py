@@ -3,20 +3,52 @@ from selenium.webdriver.common.by import By
 from Mapped import Components as Cp
 from datetime import datetime
 
-options = webdriver.ChromeOptions()
-# options.add_argument("--headless")
-dv = webdriver.Chrome()
 
 
 
-def do_registration(username, password, data, activity):
+def do_login(dv, username, password):
     try:
         dv.get(Cp.SITE)
         dv.maximize_window()
         dv.find_element(By.XPATH, Cp.xpath_user).send_keys(username)
         dv.find_element(By.XPATH, Cp.xpath_password).send_keys(password)
         dv.find_element(By.XPATH, Cp.xpath_enter_inicial).click()
+        return True
+    except Exception as e:
+        return False
 
+
+
+def limpa_campos(dv):
+    try:
+        dv.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[4]/td[5]/input').clear()
+        dv.find_element(By.XPATH, Cp.xpath_atividade_inicial).clear()
+        dv.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[3]/td[5]/input').clear()
+        dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace('tr[1]', 'tr[2]')).clear()
+        dv.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[2]/td[5]/input').clear()
+        dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace('tr[1]', 'tr[3]')).clear()
+        dv.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[5]/input').clear()
+    except Exception as e:
+        raise Exception(f"falha durante a limpeza dos campos:  {e}!")
+
+def do_registration(json):
+    options = webdriver.ChromeOptions()
+    # options.add_argument("--headless")
+    dv = webdriver.Chrome()
+    try:
+
+        username = json['username']
+        password = json['password']
+        data = json['data']
+        activity = json['activity']
+
+        tentativas = 0
+        for i in range(3):
+            if do_login(dv, username, password):
+                break
+            tentativas += 1
+        if tentativas >= 3:
+            raise Exception("Falha durante o processo de login")
 
         if data:
             data_objeto = datetime.strptime(data, "%d/%m/%Y")
@@ -26,6 +58,10 @@ def do_registration(username, password, data, activity):
             data_hoje = datetime.today()
             data_formatada = data_hoje.strftime("%Y-%m-%d")
             dv.get(Cp.SITE_DATA + data_formatada)
+
+
+        if dv.find_element(By.XPATH, Cp.xpath_horario_inicial).get_attribute('value'):
+            limpa_campos(dv)
 
 
         #Parte inicial do registro do ponto
@@ -39,18 +75,10 @@ def do_registration(username, password, data, activity):
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[2]")).send_keys("1:00")
 
         #Parte final do registro do ponto
-
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace("tr[1]", "tr[3]")).send_keys(activity)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[3]")).send_keys("4:00")
 
         dv.find_element(By.XPATH, Cp.xpath_registra_atividade).click()
+        return {'Sucesso': True, 'Mensagem':"Registro realizado com sucesso"}
     except Exception as e:
-        print(str(e))
-
-do_registration(username="amintas.neto@mirante.net.br", password="Miojo@121996",
-              activity="Petrobras/Vigência 1/Serviços/Projetos/Apurar Receitas (SATE)/Sprint 08/Sprint 08 - Reunião-Ata", data='17/05/2024')
-
-
-
-
-
+        return {'Sucesso': False, 'Mensagem': f" Falha no registro: {e}"}
