@@ -4,10 +4,8 @@ app = Flask(__name__)
 
 @app.route('/registra-ponto', methods=['POST'])
 def sua_funcao():
-    
     json = request.json
     resultado = Service.do_registration(json)
-
     if resultado['Sucesso']:
         return resultado, 200
     else: 
