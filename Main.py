@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_basicauth import BasicAuth
 from Services import Service
 from Mapped import Components as cp

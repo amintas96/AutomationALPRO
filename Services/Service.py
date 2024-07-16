@@ -1,8 +1,8 @@
-from click.parser import Option
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from Mapped import Components as Cp
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
 
 
 def do_login(dv, username, password):
@@ -30,9 +30,39 @@ def clear_fields(dv):
         raise Exception(f"falha durante a limpeza dos campos:  {e}!")
 
 
+def generate_hour():
+    hour = random.randrange(0, 12)
+    if hour >= 10:
+        return "08:" + str(hour)
+    else:
+        return "08:0" + str(hour)
+
+
+def valid_last_7_days(dv):
+    try:
+        list_hours = []
+        for i in range(1, 8):
+            last_date = datetime.today() - timedelta(days=i)
+            data_formatada = last_date.strftime("%Y-%m-%d")
+            dv.get(Cp.SITE_DATA + data_formatada)
+            list_hours.append(dv.find_element(By.XPATH, Cp.xpath_horario_inicial).get_attribute('value'))
+
+        return list_hours
+    except Exception as e:
+        print("falha + " + str(e))
+
+
+def generate_hour_by_validation(dv):
+    hora = generate_hour()
+    if hora in valid_last_7_days(dv):
+        hora = generate_hour_by_validation(dv)
+    else:
+        return str(hora)
+
+
 def do_registration(json):
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     dv = webdriver.Chrome(options=options)
     try:
 
@@ -48,7 +78,7 @@ def do_registration(json):
             tentativas += 1
         if tentativas >= 3:
             raise Exception("Falha durante o processo de login")
-
+        hora = generate_hour_by_validation(dv)
         if data:
             data_objeto = datetime.strptime(data, "%d/%m/%Y")
             data_formatada = data_objeto.strftime("%Y-%m-%d")
@@ -61,17 +91,13 @@ def do_registration(json):
         if dv.find_element(By.XPATH, Cp.xpath_horario_inicial).get_attribute('value'):
             clear_fields(dv)
 
-        #Parte inicial do registro do ponto
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial).send_keys(activity)
-        dv.find_element(By.XPATH, Cp.xpath_horario_inicial).send_keys("8:00")
+        dv.find_element(By.XPATH, Cp.xpath_horario_inicial).send_keys(hora)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial).send_keys("4:00")
-
-        #Parte Descanso do registro
 
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace("tr[1]", "tr[2]")).send_keys(Cp.INTERVAL)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[2]")).send_keys("1:00")
 
-        #Parte final do registro do ponto
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace("tr[1]", "tr[3]")).send_keys(activity)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[3]")).send_keys("4:00")
 
