@@ -54,8 +54,8 @@ def valid_last_7_days(dv):
 
 def generate_hour_by_validation(dv):
     hora = generate_hour()
-    if hora in valid_last_7_days(dv):
-        hora = generate_hour_by_validation(dv)
+    while hora in valid_last_7_days(dv):
+        hora = generate_hour()
     else:
         return str(hora)
 
