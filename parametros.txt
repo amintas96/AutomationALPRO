@@ -1,0 +1,4 @@
+username: amintas.neto@mirante.net.br
+password:Miojo@1996
+data:14/02/2025
+activity:Petrobras/Vigência 1/Serviços/Projetos/Processos Digitais 03/Sprint 8.07 - PI - PD 3/Sprint 8.07 - PD 3 - Reunião-Ata

@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from Mapped import Components as Cp
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import random
 
 
@@ -58,19 +58,27 @@ def generate_hour_by_validation(dv):
         hora = generate_hour()
     else:
         return str(hora)
+    
+def ler_parametros(arquivo):
+    parametros = {}
+    with open(arquivo, 'r', encoding='utf-8') as file:
+        for line in file:
+            key, value = line.strip().split(':')
+            try:
+                value = str(value.strip())
+            except ValueError:
+                try:
+                    value = float(value)
+                except ValueError:
+                    pass
+            parametros[key] = value
+    return parametros
 
+def last_registration(dv,json):
 
-def do_registration(json):
-    options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")
-    dv = webdriver.Chrome(options=options)
     try:
-
         username = json['username']
         password = json['password']
-        data = json['data']
-        activity = json['activity']
-
         tentativas = 0
         for i in range(3):
             if do_login(dv, username, password):
@@ -78,11 +86,63 @@ def do_registration(json):
             tentativas += 1
         if tentativas >= 3:
             raise Exception("Falha durante o processo de login")
+        new_date = datetime.today()
+        
+        while not valid_registration_by_date(dv, new_date):            
+            new_date = new_date - timedelta(days=1)
+
+        return new_date
+
+    except Exception as e:
+        print(str(e))
+
+
+
+def registre_points(json):
+    # options.add_argument("--headless")
+    try:
+        dv = webdriver.Chrome()
+        new_date = datetime.today()
+        last_registre = last_registration(dv, json)
+
+        while last_registre < new_date:
+            last_registre = last_registre + timedelta(days=1) 
+            if last_registre.weekday() < 5:
+                json['data'] = last_registre.strftime("%Y-%m-%d")
+                do_registration(dv, json)
+        print('oi')           
+    except Exception as e:
+        print(str(e))
+
+def valid_registration_by_date(dv, date):
+    try:    
+        date_formatada = date.strftime("%Y-%m-%d")
+        dv.get(Cp.SITE_DATA + date_formatada)
+        horario = dv.find_element(By.XPATH, Cp.xpath_total_horas).get_attribute('value')
+        return horario if pode_ser_hora(horario) and datetime.strptime(horario, '%H:%M').time() >= time(7, 0) else False
+            
+    except Exception as e:
+        return False
+
+
+
+def pode_ser_hora(string, formato='%H:%M'):
+    try:
+        datetime.strptime(string, formato)
+        return True
+    except ValueError:
+        return False
+
+def do_registration(dv, json):
+    try:
+        data = json['data']
+        activity = json['activity']
         hora = generate_hour_by_validation(dv)
+
         if data:
-            data_objeto = datetime.strptime(data, "%d/%m/%Y")
-            data_formatada = data_objeto.strftime("%Y-%m-%d")
-            dv.get(Cp.SITE_DATA + data_formatada)
+            # data_objeto = datetime.strptime(data, "%d/%m/%Y")
+            # data_formatada = data.strftime("%Y-%m-%d")
+            dv.get(Cp.SITE_DATA + data)
         else:
             data_hoje = datetime.today()
             data_formatada = data_hoje.strftime("%Y-%m-%d")
@@ -94,14 +154,14 @@ def do_registration(json):
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial).send_keys(activity)
         dv.find_element(By.XPATH, Cp.xpath_horario_inicial).send_keys(hora)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial).send_keys("4:00")
-
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace("tr[1]", "tr[2]")).send_keys(Cp.INTERVAL)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[2]")).send_keys("1:00")
-
         dv.find_element(By.XPATH, Cp.xpath_atividade_inicial.replace("tr[1]", "tr[3]")).send_keys(activity)
         dv.find_element(By.XPATH, Cp.xpath_fimHora_inicial.replace("tr[1]", "tr[3]")).send_keys("4:00")
 
         dv.find_element(By.XPATH, Cp.xpath_registra_atividade).click()
+
         return {'Sucesso': True, 'Mensagem': "Registro realizado com sucesso"}
     except Exception as e:
         return {'Sucesso': False, 'Mensagem': f" Falha no registro: {e}"}
+

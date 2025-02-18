@@ -9,6 +9,7 @@ xpath_atividade_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/t
 xpath_horario_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[5]/input'
 xpath_fimHora_inicial = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tbody/tr[1]/td[6]/input'
 xpath_registra_atividade = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tfoot/tr[2]/td/button'
+xpath_total_horas = '/html/body/div[1]/div[3]/div/form[2]/fieldset/table/tfoot/tr[1]/td[3]/div/h3/input'
 INTERVAL = 'Intervalo (Não Contabilizado)'
 
 USUARIO_AUTH = 'amintas'
