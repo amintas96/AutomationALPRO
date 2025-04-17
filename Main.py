@@ -26,5 +26,5 @@ from Services import Service
  
 if __name__ == '__main__':
     # while True:
-    json = Service.ler_parametros(arquivo=r"C:\Users\amint\Documents\GitHub\AutomationALPRO\parametros.txt")
+    json = Service.ler_parametros(arquivo="parametros.txt")
     Service.registre_points(json)

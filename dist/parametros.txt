@@ -1,0 +1,4 @@
+username: amintas.neto@mirante.net.br
+password:Miojo@1996
+data:13/03/2025
+activity:Sprint 9.02 - PD 2 - Reunião-Ata

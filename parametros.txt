@@ -1,4 +1,4 @@
 username: amintas.neto@mirante.net.br
 password:Miojo@1996
 data:14/02/2025
-activity:Petrobras/Vigência 1/Serviços/Projetos/Processos Digitais 03/Sprint 8.07 - PI - PD 3/Sprint 8.07 - PD 3 - Reunião-Ata
+activity:Petrobras/Outsystems - Vigência 1/Outsystems - Serviços/Projetos/Processos Digitais 02 (DIGF2)/Sprint 9.04 - PD 2 - SFSPNT0010240/Sprint 9.04 - PD 2 - SFSPNT0010240 - Reunião-Ata
